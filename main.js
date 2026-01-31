@@ -37,6 +37,7 @@ const state = {
   obstacles: [],
   stars: [],
   usingCamera: false,
+  cameraRunner: null,
 };
 
 const player = {
@@ -364,6 +365,10 @@ async function startCamera() {
     ui.status.textContent = "Camera nao suportada";
     return false;
   }
+  if (!window.isSecureContext) {
+    ui.status.textContent = "Acesso a camera requer https ou localhost";
+    return false;
+  }
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
     ui.cameraVideo.srcObject = stream;
@@ -385,11 +390,23 @@ function setupHands() {
   });
   hands.setOptions({
     maxNumHands: 1,
-    modelComplexity: 1,
-    minDetectionConfidence: 0.7,
-    minTrackingConfidence: 0.6,
+    modelComplexity: 0,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5,
   });
   hands.onResults(onHandsResults);
+
+  if (typeof Camera !== "undefined") {
+    state.cameraRunner = new Camera(ui.cameraVideo, {
+      onFrame: async () => {
+        await hands.send({ image: ui.cameraVideo });
+      },
+      width: 640,
+      height: 480,
+    });
+    state.cameraRunner.start();
+    return;
+  }
 
   let lastVideoTime = -1;
   const processFrame = async () => {
@@ -464,7 +481,6 @@ function classifyGesture(landmarks) {
   const middleMcp = landmarks[9];
   const palmSize = distance(wrist, middleMcp);
   const fingers = [
-    [4, 2],
     [8, 5],
     [12, 9],
     [16, 13],
@@ -475,7 +491,7 @@ function classifyGesture(landmarks) {
   fingers.forEach(([tip, mcp]) => {
     const tipDist = distance(landmarks[tip], wrist);
     const mcpDist = distance(landmarks[mcp], wrist);
-    if (tipDist > mcpDist + palmSize * 0.35) {
+    if (tipDist > mcpDist + palmSize * 0.25) {
       extended += 1;
     }
   });
