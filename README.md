@@ -2,6 +2,8 @@
 
 Casual runner inspirado na mecanica do Dino Chrome, com identidade visual autoral e controle por gestos usando webcam. O projeto foi pensado como case de portfolio para demonstrar integracao entre UX, game loop e visao computacional.
 
+![Demo do jogo](assets/dino-chrome.gif)
+
 ## Destaques
 - Controles por gestos: mao aberta = pulo, mao fechada = agachar
 - Dificuldade leve e ritmo fluido para demonstracoes
