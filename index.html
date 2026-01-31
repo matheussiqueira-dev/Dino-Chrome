@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Orion Run - Gesture Runner</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game"></canvas>
+
+      <div id="hud" class="panel">
+        <div class="hud-block">
+          <div class="label">Score</div>
+          <div id="score" class="value">0</div>
+        </div>
+        <div class="hud-block">
+          <div class="label">Gesto</div>
+          <div id="gesture" class="value">Aguardando</div>
+        </div>
+        <div class="hud-block">
+          <div class="label">Status</div>
+          <div id="status" class="value">Pronto</div>
+        </div>
+      </div>
+
+      <div id="camera-panel" class="panel">
+        <div class="label">Camera</div>
+        <video id="camera" autoplay muted playsinline></video>
+      </div>
+
+      <div id="start-screen" class="screen">
+        <div class="screen-card">
+          <div class="game-title">Orion Run</div>
+          <p class="intro">
+            Um runner casual controlado por gestos de mao. Levante a mao para pular e feche
+            a mao para agachar. Dificuldade leve para testar reconhecimento e fluidez.
+          </p>
+
+          <div class="gesture-grid">
+            <div class="gesture-card">
+              <div class="gesture-icon open"></div>
+              <div class="gesture-text">Mao aberta = Pular</div>
+            </div>
+            <div class="gesture-card">
+              <div class="gesture-icon closed"></div>
+              <div class="gesture-text">Mao fechada = Agachar</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="start-camera" class="primary">Iniciar com camera</button>
+            <button id="start-keyboard" class="ghost">Iniciar sem camera</button>
+          </div>
+
+          <div class="hint">
+            Dica: para usar a webcam, execute o jogo em um servidor local (ex.: http://localhost).
+          </div>
+        </div>
+      </div>
+
+      <div id="gameover-screen" class="screen hidden">
+        <div class="screen-card">
+          <div class="gameover-title">Fim de jogo</div>
+          <div class="gameover-score">
+            <span>Score final:</span>
+            <strong id="final-score">0</strong>
+          </div>
+          <button id="restart" class="primary">Jogar novamente</button>
+        </div>
+      </div>
+
+      <div id="signature">
+        <span>Matheus Siqueira</span>
+        <span class="divider">|</span>
+        <a href="https://www.matheussiqueira.dev" target="_blank" rel="noopener">
+          Contato: [www.matheussiqueira.dev
+        </a>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.min.js"></script>
+    <script src="main.js" defer></script>
+  </body>
+</html>
