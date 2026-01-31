@@ -56,6 +56,9 @@ const gestureState = {
   stable: "none",
   buffer: [],
   lastStable: "none",
+  holdUntil: 0,
+  lastJumpAt: 0,
+  jumpCooldown: 450,
 };
 
 const inputState = {
@@ -339,14 +342,20 @@ function updateGestureInput() {
   if (!state.usingCamera) {
     return;
   }
+  const now = performance.now();
   if (gestureState.stable === "closed") {
     inputState.crouchActive = true;
   } else {
     inputState.crouchActive = false;
   }
 
-  if (gestureState.stable === "open" && gestureState.lastStable !== "open" && player.onGround) {
+  if (
+    gestureState.stable === "open" &&
+    player.onGround &&
+    now - gestureState.lastJumpAt > gestureState.jumpCooldown
+  ) {
     inputState.jumpQueued = true;
+    gestureState.lastJumpAt = now;
   }
   gestureState.lastStable = gestureState.stable;
 }
@@ -446,7 +455,7 @@ function onHandsResults(results) {
 function updateGestureBuffer(gesture) {
   const buffer = gestureState.buffer;
   buffer.push(gesture);
-  if (buffer.length > 8) {
+  if (buffer.length > 10) {
     buffer.shift();
   }
   const counts = buffer.reduce(
@@ -457,19 +466,26 @@ function updateGestureBuffer(gesture) {
     { open: 0, closed: 0, none: 0 }
   );
 
-  let stable = "none";
-  if (counts.open >= 5) {
-    stable = "open";
-  } else if (counts.closed >= 5) {
-    stable = "closed";
-  } else if (counts.none >= 5) {
-    stable = "none";
+  let candidate = "none";
+  if (counts.open >= 4) {
+    candidate = "open";
+  } else if (counts.closed >= 4) {
+    candidate = "closed";
+  } else if (counts.none >= 6) {
+    candidate = "none";
   }
-  gestureState.stable = stable;
 
-  if (stable === "open") {
+  const now = performance.now();
+  if (candidate === "open" || candidate === "closed") {
+    gestureState.stable = candidate;
+    gestureState.holdUntil = now + 350;
+  } else if (now >= gestureState.holdUntil) {
+    gestureState.stable = "none";
+  }
+
+  if (gestureState.stable === "open") {
     updateGestureUI("Mao aberta");
-  } else if (stable === "closed") {
+  } else if (gestureState.stable === "closed") {
     updateGestureUI("Mao fechada");
   } else {
     updateGestureUI("Nenhum");
@@ -491,12 +507,12 @@ function classifyGesture(landmarks) {
   fingers.forEach(([tip, mcp]) => {
     const tipDist = distance(landmarks[tip], wrist);
     const mcpDist = distance(landmarks[mcp], wrist);
-    if (tipDist > mcpDist + palmSize * 0.25) {
+    if (tipDist > mcpDist + palmSize * 0.2) {
       extended += 1;
     }
   });
 
-  if (extended >= 3) {
+  if (extended >= 2) {
     return "open";
   }
   if (extended <= 1) {
