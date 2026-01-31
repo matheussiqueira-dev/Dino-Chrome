@@ -42,4 +42,4 @@ Casual runner inspirado na mecanica do Dino Chrome, com identidade visual autora
 - Placares e modo desafio
 
 ---
-Autoria de Matheus Siqueira7
+Autoria de Matheus Siqueira.
