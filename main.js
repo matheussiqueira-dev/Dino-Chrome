@@ -94,15 +94,23 @@ function resetGame() {
   state.speed = config.speed;
   state.spawnTimer = rand(config.spawnMin, config.spawnMax);
   state.obstacles = [];
+  gestureState.buffer = [];
+  gestureState.raw = "none";
+  gestureState.stable = "none";
+  gestureState.lastStable = "none";
   player.y = 0;
   player.vy = 0;
   player.onGround = true;
   player.isCrouching = false;
   inputState.jumpQueued = false;
   inputState.crouchActive = false;
+  updateGestureUI("Aguardando");
 }
 
 function startGame() {
+  if (state.running) {
+    return;
+  }
   resetGame();
   state.running = true;
   state.lastTime = performance.now();
@@ -149,6 +157,7 @@ function update(dt) {
 }
 
 function updatePlayer(dt) {
+  const frameScale = dt * 60;
   if (inputState.crouchActive && player.onGround) {
     player.isCrouching = true;
   } else if (!inputState.crouchActive) {
@@ -161,8 +170,8 @@ function updatePlayer(dt) {
     inputState.jumpQueued = false;
   }
 
-  player.vy -= config.gravity * dt * 60;
-  player.y += player.vy;
+  player.vy -= config.gravity * frameScale;
+  player.y += player.vy * frameScale;
 
   if (player.y <= 0) {
     player.y = 0;
@@ -349,6 +358,10 @@ async function startCamera() {
   const hasMediaPipe = typeof Hands !== "undefined";
   if (!hasMediaPipe) {
     ui.status.textContent = "MediaPipe indisponivel";
+    return false;
+  }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    ui.status.textContent = "Camera nao suportada";
     return false;
   }
   try {
