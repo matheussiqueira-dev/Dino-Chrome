@@ -1,0 +1,6 @@
+node_modules/
+coverage/
+.DS_Store
+.env
+server/data/leaderboard.runtime.json
+npm-debug.log*

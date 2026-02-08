@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Orion Run Pro: runner fullstack com UX moderna, leaderboard online e controle por teclado ou gestos."
+    />
+    <title>Orion Run Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+
+    <div id="app" class="app-shell">
+      <header class="topbar" aria-label="Painel superior">
+        <div class="brand">
+          <span class="brand-mark">OR</span>
+          <div>
+            <h1>Orion Run Pro</h1>
+            <p>Runner com arquitetura fullstack e UX premium</p>
+          </div>
+        </div>
+
+        <div class="hud-grid" aria-live="polite">
+          <div class="hud-card">
+            <span>Score</span>
+            <strong id="score-value">0</strong>
+          </div>
+          <div class="hud-card">
+            <span>Recorde</span>
+            <strong id="best-value">0</strong>
+          </div>
+          <div class="hud-card">
+            <span>Status</span>
+            <strong id="status-value">Pronto</strong>
+          </div>
+          <div class="hud-card">
+            <span>Gesto</span>
+            <strong id="gesture-value">Nenhum</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="content" aria-label="Area principal">
+        <section class="game-stage" aria-label="Jogo">
+          <canvas id="game-canvas" aria-label="Canvas do jogo"></canvas>
+
+          <div id="pause-badge" class="pause-badge hidden" role="status">Jogo pausado</div>
+
+          <div id="start-screen" class="overlay">
+            <div class="overlay-card reveal">
+              <h2>Inicie sua corrida</h2>
+              <p>
+                Ajuste seu perfil de jogo, escolha o nivel de desafio e entre na pista com teclado
+                ou camera.
+              </p>
+
+              <form id="start-form" class="form-grid" autocomplete="off">
+                <label>
+                  Nome no ranking
+                  <input
+                    id="player-name"
+                    name="playerName"
+                    type="text"
+                    minlength="2"
+                    maxlength="20"
+                    value="Player"
+                    required
+                  />
+                </label>
+
+                <label>
+                  Dificuldade
+                  <select id="difficulty" name="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="normal" selected>Normal</option>
+                    <option value="hard">Hard</option>
+                  </select>
+                </label>
+
+                <div class="switch-line">
+                  <label class="switch-label" for="high-contrast-toggle">
+                    Alto contraste
+                  </label>
+                  <input id="high-contrast-toggle" type="checkbox" />
+                </div>
+
+                <div class="switch-line">
+                  <label class="switch-label" for="reduced-motion-toggle">
+                    Reduzir animacoes
+                  </label>
+                  <input id="reduced-motion-toggle" type="checkbox" />
+                </div>
+              </form>
+
+              <div class="cta-row">
+                <button id="start-keyboard-btn" class="btn primary" type="button">Iniciar no teclado</button>
+                <button id="start-camera-btn" class="btn secondary" type="button">Iniciar com camera</button>
+              </div>
+
+              <p class="hint">Atalhos: `Espaco` para pular, `Seta para baixo` para agachar e `P` para pausar.</p>
+            </div>
+          </div>
+
+          <div id="gameover-screen" class="overlay hidden">
+            <div class="overlay-card reveal">
+              <h2>Fim de partida</h2>
+              <p class="score-line">
+                Score final: <strong id="final-score">0</strong>
+              </p>
+
+              <div class="cta-row">
+                <button id="save-score-btn" class="btn primary" type="button">Salvar no ranking</button>
+                <button id="restart-btn" class="btn secondary" type="button">Jogar novamente</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="sidebar" aria-label="Painel lateral">
+          <section class="panel">
+            <h3>Leaderboard</h3>
+            <p class="panel-copy">Top jogadores por score.</p>
+            <ol id="leaderboard-list" class="leaderboard-list"></ol>
+            <button id="refresh-leaderboard-btn" class="btn tertiary" type="button">Atualizar ranking</button>
+          </section>
+
+          <section class="panel">
+            <h3>Controle por camera</h3>
+            <p class="panel-copy">Mao aberta para pulo, mao fechada para agachar.</p>
+            <video id="camera-preview" autoplay muted playsinline aria-label="Preview da camera"></video>
+          </section>
+
+          <section class="panel">
+            <h3>Produto</h3>
+            <ul class="feature-list">
+              <li>Leaderboard online com API versionada</li>
+              <li>Camadas separadas para logica, input e render</li>
+              <li>Preferencias de acessibilidade persistidas</li>
+            </ul>
+          </section>
+        </aside>
+      </main>
+
+      <footer class="footer">
+        <span>Matheus Siqueira</span>
+        <span class="divider" aria-hidden="true">|</span>
+        <a href="https://www.matheussiqueira.dev/" target="_blank" rel="noopener noreferrer"
+          >https://www.matheussiqueira.dev/</a
+        >
+      </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.min.js" defer></script>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
