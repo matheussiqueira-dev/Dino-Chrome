@@ -4,3 +4,5 @@ coverage/
 .env
 server/data/leaderboard.runtime.json
 npm-debug.log*
+.claude/
+.cto-toolkit/
