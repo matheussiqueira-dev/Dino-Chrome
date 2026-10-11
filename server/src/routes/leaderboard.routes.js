@@ -6,7 +6,9 @@ export function createLeaderboardRouter(controller, env) {
 
   router.get("/", controller.list);
   router.post("/", controller.create);
-  router.delete("/", authorizeAdmin(env.adminApiKey), controller.reset);
+  if (env.adminApiKey) {
+    router.delete("/", authorizeAdmin(env.adminApiKey), controller.reset);
+  }
 
   return router;
 }

@@ -4,8 +4,9 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { createApp } from "../src/app.js";
+import { loadEnv } from "../src/config/env.js";
 
-async function startTestServer() {
+async function startTestServer(overrides = {}) {
   const tempDirectory = await mkdtemp(path.join(os.tmpdir(), "orion-run-test-"));
   const leaderboardPath = path.join(tempDirectory, "leaderboard.json");
 
@@ -18,6 +19,7 @@ async function startTestServer() {
     leaderboardMaxEntries: 100,
     requestBodyLimit: "32kb",
     clientPath: path.resolve("client"),
+    ...overrides,
   };
 
   const app = createApp(env);
@@ -125,5 +127,43 @@ test("leaderboard valida payload e protege reset por autorizacao", async () => {
     assert.equal(authorizedReset.status, 200);
   } finally {
     await context.close();
+  }
+});
+
+test("leaderboard sem ADMIN_API_KEY nao expoe a rota de reset", async () => {
+  const context = await startTestServer({ adminApiKey: null });
+
+  try {
+    const response = await fetch(`${context.baseUrl}/api/v1/leaderboard`, {
+      method: "DELETE",
+      headers: {
+        "x-admin-key": "qualquer-chave",
+      },
+    });
+
+    assert.equal(response.status, 404);
+  } finally {
+    await context.close();
+  }
+});
+
+test("loadEnv exige ADMIN_API_KEY em producao", () => {
+  const original = { NODE_ENV: process.env.NODE_ENV, ADMIN_API_KEY: process.env.ADMIN_API_KEY };
+
+  try {
+    process.env.NODE_ENV = "production";
+    delete process.env.ADMIN_API_KEY;
+    assert.throws(() => loadEnv(), /ADMIN_API_KEY/);
+
+    process.env.ADMIN_API_KEY = "chave-gerada-no-teste";
+    assert.equal(loadEnv().adminApiKey, "chave-gerada-no-teste");
+  } finally {
+    for (const [key, value] of Object.entries(original)) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
   }
 });

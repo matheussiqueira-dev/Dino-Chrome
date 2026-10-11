@@ -11,10 +11,18 @@ function parseNumber(value, fallback) {
 }
 
 export function loadEnv() {
+  const nodeEnv = process.env.NODE_ENV ?? "development";
+  // Sem chave, a rota DELETE /api/v1/leaderboard nao e registrada.
+  const adminApiKey = process.env.ADMIN_API_KEY?.trim() || null;
+
+  if (nodeEnv === "production" && !adminApiKey) {
+    throw new Error("ADMIN_API_KEY e obrigatoria quando NODE_ENV=production");
+  }
+
   return {
-    nodeEnv: process.env.NODE_ENV ?? "development",
+    nodeEnv,
     port: parseNumber(process.env.PORT, 8080),
-    adminApiKey: process.env.ADMIN_API_KEY ?? "orion-admin-dev-key",
+    adminApiKey,
     corsOrigin: process.env.CORS_ORIGIN ?? "*",
     leaderboardPath: process.env.LEADERBOARD_FILE ?? path.join(projectRoot, "server/data/leaderboard.json"),
     leaderboardMaxEntries: parseNumber(process.env.LEADERBOARD_MAX_ENTRIES, 100),
