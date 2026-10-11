@@ -145,26 +145,80 @@ Endpoints:
   - Melhor score local
 
 ## Como instalar e executar
-### 1) Instalar dependencias
+### Pre-requisitos
+- Node.js 20 ou superior (`node -v` para conferir)
+- npm (instalado junto com o Node.js)
+- Git
+- Navegador moderno; webcam opcional para o modo por gestos
+
+### 1) Clonar o repositorio
 ```bash
-npm install
+git clone https://github.com/matheussiqueira-dev/Dino-Chrome.git
+cd Dino-Chrome
 ```
 
-### 2) Rodar em desenvolvimento
+### 2) Instalar dependencias
+Use `npm ci` para instalar exatamente as versoes do `package-lock.json`:
 ```bash
-npm run dev
+npm ci
 ```
 
-### 3) Rodar em producao local
-```bash
-npm start
-```
+### 3) Executar
+| Comando | Uso |
+| --- | --- |
+| `npm start` | Sobe o servidor normalmente |
+| `npm run dev` | Sobe o servidor e reinicia automaticamente ao salvar arquivos do backend |
+| `npm test` | Executa a suite de testes |
 
-Aplicacao disponivel em:
-- `http://localhost:8080`
+O mesmo servidor entrega o jogo e a API. Depois de iniciar, abra:
+- Jogo: `http://localhost:8080`
+- Health check: `http://localhost:8080/api/v1/health`
+
+Para parar o servidor, pressione `Ctrl + C` no terminal.
+
+### 4) Como jogar
+Na tela inicial, escolha **Iniciar no teclado** ou **Iniciar com camera**.
+
+| Acao | Teclado | Gestos (webcam) |
+| --- | --- | --- |
+| Pular | `Espaco` ou `Seta para cima` | Mao aberta |
+| Abaixar | Segurar `Seta para baixo` | Mao fechada |
+| Pausar | `P` ou `Esc` | - |
+
+Ao fim da corrida, use **Salvar no ranking** para registrar o score no leaderboard.
 
 Observacao sobre camera:
-- Webcam exige contexto seguro (`localhost` ou `https`).
+- Webcam exige contexto seguro (`localhost` ou `https`) e permissao do navegador.
+
+### Variaveis de ambiente (opcionais)
+O projeto funciona sem configuracao. Os valores padrao sao:
+
+| Variavel | Padrao | Descricao |
+| --- | --- | --- |
+| `PORT` | `8080` | Porta do servidor |
+| `NODE_ENV` | `development` | Ambiente de execucao |
+| `ADMIN_API_KEY` | `orion-admin-dev-key` | Chave para `DELETE /api/v1/leaderboard`; troque em producao |
+| `CORS_ORIGIN` | `*` | Origem permitida pelo CORS |
+| `LEADERBOARD_FILE` | `server/data/leaderboard.json` | Arquivo JSON do ranking |
+| `LEADERBOARD_MAX_ENTRIES` | `100` | Maximo de scores guardados |
+| `REQUEST_BODY_LIMIT` | `32kb` | Tamanho maximo do corpo das requisicoes |
+
+O servidor nao le arquivos `.env`; defina as variaveis no terminal antes de iniciar. Exemplo trocando a porta:
+
+```bash
+# Linux / macOS / Git Bash
+PORT=3000 npm start
+```
+
+```powershell
+# Windows PowerShell
+$env:PORT = "3000"; npm start
+```
+
+### Problemas comuns
+- **Porta 8080 ocupada (`EADDRINUSE`)**: pare o outro processo ou use outra porta com `PORT`.
+- **Erro de sintaxe ou de modulo ao iniciar**: confira se o Node.js e 20 ou superior.
+- **Camera nao abre**: acesse por `http://localhost` (nao pelo IP da rede) e permita o uso da camera no navegador.
 
 ## Testes
 Executar suite automatizada:
