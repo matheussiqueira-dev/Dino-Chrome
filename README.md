@@ -30,6 +30,7 @@ Melhorias entregues:
 - Arquitetura em camadas no backend (config, middleware, controller, service, repository, validation)
 - Frontend modular com separacao entre dominio, infraestrutura, apresentacao e aplicacao
 - Leaderboard persistente via API REST `/api/v1`
+- Ranking local no navegador (top 10) quando a API não existe ou não responde
 - Validacao forte de dados com `zod`
 - Autorizacao administrativa para reset de ranking (`x-admin-key`)
 - Tratamento centralizado de erros + request id + logging HTTP
@@ -185,7 +186,7 @@ Na tela inicial, escolha **Iniciar no teclado** ou **Iniciar com camera**.
 | Abaixar | Segurar `Seta para baixo` | Mao fechada |
 | Pausar | `P` ou `Esc` | - |
 
-Ao fim da corrida, use **Salvar no ranking** para registrar o score no leaderboard.
+Ao fim da corrida, use **Salvar no ranking** para registrar o score no leaderboard. Se a API estiver fora do ar (ou o cliente for publicado sem servidor), o score vai para um ranking local guardado apenas neste navegador, e o status indica "Ranking local".
 
 Observacao sobre camera:
 - Webcam exige contexto seguro (`localhost` ou `https`) e permissao do navegador.
@@ -230,6 +231,7 @@ npm test
 
 Cobertura atual de testes:
 - Unitario: regras de servico do leaderboard
+- Unitario (cliente): ranking local e fallback da API (`client/tests`)
 - Integracao: fluxos reais da API (health, create/list, validacao, auth)
 
 ## Deploy (guia rapido)

@@ -9,8 +9,8 @@
   "scripts": {
     "dev": "node --watch server/src/server.js",
     "start": "node server/src/server.js",
-    "test": "node --test server/tests/*.test.js",
-    "test:watch": "node --test --watch server/tests/*.test.js"
+    "test": "node --test server/tests/*.test.js client/tests/*.test.js",
+    "test:watch": "node --test --watch server/tests/*.test.js client/tests/*.test.js"
   },
   "dependencies": {
     "compression": "^1.8.1",

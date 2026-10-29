@@ -6,6 +6,12 @@ function parseErrorPayload(payload) {
   return "Falha de comunicacao com API";
 }
 
+function createApiError(status, payload) {
+  const error = new Error(parseErrorPayload(payload));
+  error.status = status;
+  return error;
+}
+
 export class LeaderboardApi {
   constructor(baseUrl = "/api/v1") {
     this.baseUrl = baseUrl;
@@ -21,7 +27,7 @@ export class LeaderboardApi {
       } catch {
         payload = null;
       }
-      throw new Error(parseErrorPayload(payload));
+      throw createApiError(response.status, payload);
     }
 
     return response.json();
@@ -43,7 +49,7 @@ export class LeaderboardApi {
       } catch {
         payload = null;
       }
-      throw new Error(parseErrorPayload(payload));
+      throw createApiError(response.status, payload);
     }
 
     return response.json();

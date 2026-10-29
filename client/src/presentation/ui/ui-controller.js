@@ -1,3 +1,5 @@
+import { toLeaderboardRows } from "../../domain/local-leaderboard.js";
+
 export class UIController {
   constructor() {
     this.elements = {
@@ -85,33 +87,36 @@ export class UIController {
   }
 
   renderLeaderboard(entries) {
-    this.elements.leaderboardList.innerHTML = "";
+    const list = this.elements.leaderboardList;
+    list.replaceChildren();
 
-    if (!entries.length) {
-      const emptyItem = document.createElement("li");
-      emptyItem.className = "leaderboard-item";
-      emptyItem.innerHTML = '<span class="rank">-</span><div><div class="name">Sem scores</div><div class="meta">Jogue para entrar no ranking</div></div><strong class="score">0</strong>';
-      this.elements.leaderboardList.appendChild(emptyItem);
-      return;
-    }
+    const rows = entries.length
+      ? toLeaderboardRows(entries)
+      : [{ rank: "-", name: "Sem scores", meta: "Jogue para entrar no ranking", score: "0" }];
 
-    entries.forEach((entry, index) => {
+    rows.forEach((row) => {
       const item = document.createElement("li");
       item.className = "leaderboard-item";
 
-      const createdAt = new Date(entry.createdAt);
-      const when = Number.isNaN(createdAt.getTime()) ? "-" : createdAt.toLocaleDateString("pt-BR");
+      const rank = document.createElement("span");
+      rank.className = "rank";
+      rank.textContent = row.rank;
 
-      item.innerHTML = `
-        <span class="rank">${index + 1}</span>
-        <div>
-          <div class="name">${entry.playerName}</div>
-          <div class="meta">${entry.difficulty} • ${entry.controlMode} • ${when}</div>
-        </div>
-        <strong class="score">${Math.floor(entry.score)}</strong>
-      `;
+      const details = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = row.name;
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.textContent = row.meta;
+      details.append(name, meta);
 
-      this.elements.leaderboardList.appendChild(item);
+      const score = document.createElement("strong");
+      score.className = "score";
+      score.textContent = row.score;
+
+      item.append(rank, details, score);
+      list.appendChild(item);
     });
   }
 

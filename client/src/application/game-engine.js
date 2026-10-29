@@ -298,7 +298,7 @@ export class GameEngine {
     this.ui.setSaveButtonLoading(true);
 
     try {
-      await this.leaderboardApi.submitScore({
+      const result = await this.leaderboardApi.submitScore({
         playerName: this.state.playerName,
         score: Math.floor(this.state.score),
         difficulty: this.state.difficulty,
@@ -306,8 +306,10 @@ export class GameEngine {
         durationMs: Math.floor(performance.now() - this.state.startedAt),
       });
 
-      this.ui.setStatus("Score salvo no ranking");
       await this.refreshLeaderboard();
+      this.ui.setStatus(result?.source === "local"
+        ? "Score salvo no ranking local (API indisponível)"
+        : "Score salvo no ranking");
     } catch (error) {
       this.ui.setStatus(`Falha ao salvar score: ${error.message}`);
     } finally {
@@ -319,6 +321,9 @@ export class GameEngine {
     try {
       const data = await this.leaderboardApi.getLeaderboard(10);
       this.ui.renderLeaderboard(data.entries ?? []);
+      if (data.source === "local") {
+        this.ui.setStatus("Ranking local (API indisponível)");
+      }
     } catch (error) {
       this.ui.setStatus(`Ranking indisponivel: ${error.message}`);
       this.ui.renderLeaderboard([]);
