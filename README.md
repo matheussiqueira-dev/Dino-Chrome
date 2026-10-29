@@ -201,6 +201,8 @@ O projeto funciona sem configuracao. Os valores padrao sao:
 | `CORS_ORIGIN` | `*` | Origem permitida pelo CORS |
 | `LEADERBOARD_FILE` | `server/data/leaderboard.json` | Arquivo JSON do ranking |
 | `LEADERBOARD_MAX_ENTRIES` | `100` | Maximo de scores guardados |
+| `RATE_LIMIT_WINDOW_MS` | `60000` | Janela da limitação de taxa nas rotas de escrita |
+| `RATE_LIMIT_MAX` | `20` | Requisições de escrita por IP na janela; acima disso a API responde 429 |
 | `REQUEST_BODY_LIMIT` | `32kb` | Tamanho maximo do corpo das requisicoes |
 
 O servidor nao le arquivos `.env`; defina as variaveis no terminal antes de iniciar. Exemplo trocando a porta:

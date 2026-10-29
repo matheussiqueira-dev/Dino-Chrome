@@ -26,6 +26,8 @@ export function loadEnv() {
     corsOrigin: process.env.CORS_ORIGIN ?? "*",
     leaderboardPath: process.env.LEADERBOARD_FILE ?? path.join(projectRoot, "server/data/leaderboard.json"),
     leaderboardMaxEntries: parseNumber(process.env.LEADERBOARD_MAX_ENTRIES, 100),
+    rateLimitWindowMs: parseNumber(process.env.RATE_LIMIT_WINDOW_MS, 60000),
+    rateLimitMax: parseNumber(process.env.RATE_LIMIT_MAX, 20),
     requestBodyLimit: process.env.REQUEST_BODY_LIMIT ?? "32kb",
     projectRoot,
     clientPath: path.join(projectRoot, "client"),

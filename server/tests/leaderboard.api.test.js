@@ -167,3 +167,27 @@ test("loadEnv exige ADMIN_API_KEY em producao", () => {
     }
   }
 });
+
+test("rotas de escrita respondem 429 acima do limite da janela", async () => {
+  const context = await startTestServer({ rateLimitMax: 2, rateLimitWindowMs: 60000 });
+
+  try {
+    const submit = () => fetch(`${context.baseUrl}/api/v1/leaderboard`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ playerName: "Ana", score: 10 }),
+    });
+
+    assert.equal((await submit()).status, 201);
+    assert.equal((await submit()).status, 201);
+
+    const limited = await submit();
+    assert.equal(limited.status, 429);
+    assert.ok(Number(limited.headers.get("retry-after")) >= 1);
+
+    const read = await fetch(`${context.baseUrl}/api/v1/leaderboard`);
+    assert.equal(read.status, 200);
+  } finally {
+    await context.close();
+  }
+});
