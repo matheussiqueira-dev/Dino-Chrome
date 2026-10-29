@@ -2,7 +2,7 @@ import { HttpError } from "../errors/http-error.js";
 
 const MAX_TRACKED_CLIENTS = 10000;
 
-export function createRateLimiter({ windowMs, max, now = () => Date.now() }) {
+export function createRateLimiter({ windowMs, max, now = () => Date.now(), maxTrackedClients = MAX_TRACKED_CLIENTS }) {
   const hits = new Map();
 
   function prune(currentTime) {
@@ -19,10 +19,10 @@ export function createRateLimiter({ windowMs, max, now = () => Date.now() }) {
     let bucket = hits.get(key);
 
     if (!bucket || bucket.resetAt <= currentTime) {
-      if (hits.size >= MAX_TRACKED_CLIENTS) {
+      if (hits.size >= maxTrackedClients) {
         prune(currentTime);
       }
-      if (hits.size >= MAX_TRACKED_CLIENTS) {
+      if (hits.size >= maxTrackedClients) {
         hits.delete(hits.keys().next().value);
       }
       bucket = { count: 0, resetAt: currentTime + windowMs };

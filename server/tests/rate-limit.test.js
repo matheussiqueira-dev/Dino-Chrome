@@ -28,3 +28,28 @@ test("rate limiter permite ate o limite e responde 429 depois", () => {
   clock = 1000;
   assert.equal(runLimiter(limiter).error, undefined);
 });
+
+test("rate limiter limita a memoria descartando clientes antigos", () => {
+  let clock = 0;
+  const limiter = createRateLimiter({ windowMs: 1000, max: 1, now: () => clock, maxTrackedClients: 2 });
+
+  runLimiter(limiter, "a");
+  runLimiter(limiter, "b");
+  assert.equal(runLimiter(limiter, "a").error.statusCode, 429);
+
+  runLimiter(limiter, "c");
+  assert.equal(runLimiter(limiter, "a").error, undefined, "cliente mais antigo foi descartado");
+
+  clock = 1000;
+  runLimiter(limiter, "d");
+  assert.equal(runLimiter(limiter, "c").error, undefined, "janelas expiradas sao removidas");
+});
+
+test("rate limiter usa chave padrao quando o ip nao esta disponivel", () => {
+  const limiter = createRateLimiter({ windowMs: 1000, max: 1, now: () => 0 });
+  const response = { setHeader() {} };
+  let error;
+  limiter({}, response, () => {});
+  limiter({}, response, (forwarded) => { error = forwarded; });
+  assert.equal(error.statusCode, 429);
+});
