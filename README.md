@@ -198,7 +198,7 @@ O projeto funciona sem configuracao. Os valores padrao sao:
 | `PORT` | `8080` | Porta do servidor |
 | `NODE_ENV` | `development` | Ambiente de execucao |
 | `ADMIN_API_KEY` | sem padrao | Chave para `DELETE /api/v1/leaderboard`. Sem ela, a rota de reset nao existe; com `NODE_ENV=production`, o servidor nao inicia sem uma chave |
-| `CORS_ORIGIN` | `*` | Origem permitida pelo CORS |
+| `CORS_ORIGIN` | vazio | Origens externas permitidas pelo CORS, separadas por vírgula. Vazio libera só a mesma origem; `*` precisa ser definido explicitamente |
 | `LEADERBOARD_FILE` | `server/data/leaderboard.json` | Arquivo JSON do ranking |
 | `LEADERBOARD_MAX_ENTRIES` | `100` | Maximo de scores guardados |
 | `RATE_LIMIT_WINDOW_MS` | `60000` | Janela da limitação de taxa nas rotas de escrita |

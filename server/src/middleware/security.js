@@ -18,8 +18,10 @@ export function applySecurityMiddleware(app, env) {
     crossOriginResourcePolicy: { policy: "cross-origin" }
   }));
 
+  const corsOrigins = env.corsOrigins ?? [];
   app.use(cors({
-    origin: env.corsOrigin,
+    // Sem CORS_ORIGIN, nenhuma origem externa recebe cabecalhos CORS.
+    origin: corsOrigins === "*" ? "*" : corsOrigins.length > 0 ? corsOrigins : false,
     methods: ["GET", "POST"],
     maxAge: 86400
   }));

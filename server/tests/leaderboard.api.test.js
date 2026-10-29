@@ -14,7 +14,7 @@ async function startTestServer(overrides = {}) {
     nodeEnv: "test",
     port: 0,
     adminApiKey: "test-admin-key",
-    corsOrigin: "*",
+    corsOrigins: [],
     leaderboardPath,
     leaderboardMaxEntries: 100,
     requestBodyLimit: "32kb",
@@ -187,6 +187,53 @@ test("rotas de escrita respondem 429 acima do limite da janela", async () => {
 
     const read = await fetch(`${context.baseUrl}/api/v1/leaderboard`);
     assert.equal(read.status, 200);
+  } finally {
+    await context.close();
+  }
+});
+
+test("CORS recusa origem nao configurada e aceita a configurada", async () => {
+  const context = await startTestServer({ corsOrigins: ["https://jogo.example"] });
+
+  try {
+    const foreign = await fetch(`${context.baseUrl}/api/v1/leaderboard`, {
+      headers: { origin: "https://outro.example" },
+    });
+    assert.equal(foreign.headers.get("access-control-allow-origin"), null);
+
+    const allowed = await fetch(`${context.baseUrl}/api/v1/leaderboard`, {
+      headers: { origin: "https://jogo.example" },
+    });
+    assert.equal(allowed.headers.get("access-control-allow-origin"), "https://jogo.example");
+  } finally {
+    await context.close();
+  }
+});
+
+test("CORS sem configuracao nao libera nenhuma origem externa", async () => {
+  const context = await startTestServer();
+
+  try {
+    const response = await fetch(`${context.baseUrl}/api/v1/health`, {
+      headers: { origin: "https://outro.example" },
+    });
+    assert.equal(response.headers.get("access-control-allow-origin"), null);
+  } finally {
+    await context.close();
+  }
+});
+
+test("reset recusa credencial invalida de qualquer formato com 401", async () => {
+  const context = await startTestServer();
+
+  try {
+    for (const key of ["x", "test-admin-ke", "test-admin-key-extra", "TEST-ADMIN-KEY", "a".repeat(512)]) {
+      const response = await fetch(`${context.baseUrl}/api/v1/leaderboard`, {
+        method: "DELETE",
+        headers: { "x-admin-key": key },
+      });
+      assert.equal(response.status, 401, `chave ${key.slice(0, 20)} deveria ser recusada`);
+    }
   } finally {
     await context.close();
   }

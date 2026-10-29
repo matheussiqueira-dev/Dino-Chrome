@@ -10,6 +10,20 @@ function parseNumber(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+export function parseCorsOrigins(value) {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    return [];
+  }
+  if (trimmed === "*") {
+    return "*";
+  }
+  return trimmed
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
 export function loadEnv() {
   const nodeEnv = process.env.NODE_ENV ?? "development";
   // Sem chave, a rota DELETE /api/v1/leaderboard nao e registrada.
@@ -23,7 +37,7 @@ export function loadEnv() {
     nodeEnv,
     port: parseNumber(process.env.PORT, 8080),
     adminApiKey,
-    corsOrigin: process.env.CORS_ORIGIN ?? "*",
+    corsOrigins: parseCorsOrigins(process.env.CORS_ORIGIN),
     leaderboardPath: process.env.LEADERBOARD_FILE ?? path.join(projectRoot, "server/data/leaderboard.json"),
     leaderboardMaxEntries: parseNumber(process.env.LEADERBOARD_MAX_ENTRIES, 100),
     rateLimitWindowMs: parseNumber(process.env.RATE_LIMIT_WINDOW_MS, 60000),
