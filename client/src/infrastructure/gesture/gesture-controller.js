@@ -116,7 +116,7 @@ export class GestureController {
   setupHands(videoElement) {
     const hands = new window.Hands({
       locateFile(file) {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${file}`;
       },
     });
 
