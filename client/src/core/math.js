@@ -2,8 +2,8 @@ export function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function randomBetween(min, max) {
-  return Math.random() * (max - min) + min;
+export function randomBetween(min, max, random = Math.random) {
+  return random() * (max - min) + min;
 }
 
 export function toInt(value) {
